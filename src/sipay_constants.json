@@ -1,0 +1,10 @@
+{
+  "enviroments":{
+    "sandbox": "https://sandbox.sipay.es/",
+    "live": "https://live.waiap.com/"
+  },
+  "elementsIds":{
+    "div":"app",
+    "script":"pwallappjs"
+  }
+}

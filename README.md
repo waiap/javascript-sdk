@@ -15,6 +15,8 @@ La librería deberá ser requerida, en la medida de lo posible, en la etiqueta h
 <script src="https://assets-sipay.s3-eu-west-1.amazonaws.com/sdk-js/pwall-app.min.js"></script>
 ```
 
+Se recomienda descargarla de la carpeta build/ y alojarla en el servidor del comercio.
+
 ## Uso
 
 Una vez importada la librería, podremos utilizar la función `PWall`, que nos permitirá acceder al cliente del SDK. Esta función tiene dos parámetros que son:

@@ -3,7 +3,7 @@ id: sdk-js
 title: Introduction
 ---
 
-In this documentation we will explain the use of the JavaScript SDK, for the documentation on the PHP SDK go to the following [link.](https://github.com/waiap/php-sdk/blob/master/README_EN.MD)  
+In this documentation we will explain the use of the JavaScript SDK, for the documentation on the PHP SDK go to the following [link.](https://github.com/waiap/php-sdk/blob/master/README_EN.md)  
 
 ## Requirements
 

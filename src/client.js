@@ -22,21 +22,23 @@ export default class PWall{
   }
 
   checkout(){
-    this.elementId        = null;
-    this.backendUrl       = null;
-    this.submitElement    = null;
-    this.validateFunction = null;
-    this.validationArray  = null;
-    this.currencyCode     = null;
-    this.customerGroupId  = null;
-    this.saleAmount       = null;
-    this.selected         = true;
-    this.events           = {
+    this.elementId          = null;
+    this.backendUrl         = null;
+    this.submitElement      = null;
+    this.validateFunction   = null;
+    this.validationArray    = null;
+    this.currencyCode       = null;
+    this.customerGroupId    = null;
+    this.saleAmount         = null;
+    this.tags               = null;
+    this.selected           = true;
+    this.events             = {
       "beforeSubmit"      : null,
       "beforeValidation"  : null,
       "afterValidation"   : null,
       "paymentOk"         : null,
-      "paymentKo"         : null
+      "paymentKo"         : null,
+      "validationFunc"    : function(){return true;}
     }
 
     this.appendTo = function(elementId){
@@ -61,6 +63,11 @@ export default class PWall{
 
     this.currency = function (currencyCode){
       this.currencyCode = currencyCode;
+      return this;
+    }
+
+    this.setTags = function (tags) {
+      this.tags = tags;
       return this;
     }
 
@@ -113,7 +120,7 @@ export default class PWall{
       if (this._validateCheckoutData() === true && this.validateFunction() === true && this.selected === true) {
         this._callEvent("afterValidation");
         this._createAppDiv(this.elementId);
-        this._createAppScript(this.backendUrl, "false", this.customerGroupId, this.saleAmount, this.currencyCode);
+        this._createAppScript(this.backendUrl, "false", this.customerGroupId, this.saleAmount, this.currencyCode, this.tags);
         this.__log("IS VALID, RENDERING");
       } else {
         this._removeAppDiv();
@@ -165,7 +172,7 @@ export default class PWall{
       var callback = this.events[event];
       if (callback !== null && typeof callback === "function"){
         this.__log("CALLING EVENT " + event);
-        callback();
+        return callback();
       }
     }
 
@@ -181,10 +188,92 @@ export default class PWall{
 
     return this;
   }
+
+  expresscheckout(){
+    this.backendUrl       = null;
+    this.elementId        = null;
+    this.tags             = null;
+    this.profile          = null;
+    this.saleAmount       = null;
+    this.customerGroupId  = null;
+    this.currencyCode     = null;
+    this.events           = {
+      "paymentOk"         : null,
+      "paymentKo"         : null,
+      "validationFunc"    : function(){return true;}
+    }
+
+    this.backendUrl = function (url) {
+      this.backendUrl = url;
+    }
+
+    this.appendTo = function (elementId) {
+      this.elementId = elementId;
+    }
+
+    this.setTags = function (tags) {
+      this.tags = tags;
+    }
+
+    this.setProfile = function (profile) {
+      this.profile = profile;
+    }
+
+    this.groupId = function (customerGroupId) {
+      this.customerGroupId = customerGroupId;
+      return this.init();
+    }
+
+    this.amount = function (saleAmount) {
+      this.saleAmount = saleAmount * 100;
+      return this.init();
+    }
+
+    this.currency = function (currencyCode) {
+      this.currencyCode = currencyCode;
+      return this;
+    }
+
+    //Events 
+    this.on = function(event, callback){
+      if(event in this.events){
+        if(typeof callback === "function"){
+          this.events[event] = callback;
+        }else{
+          this.__log("CALLBACK ARGUMENT IS NOT A FUNCTION");
+        }
+      }else{
+        this.__log("NO EVENT FOUND WITH "+event+" IDENTIFIER");
+      }
+      return this;
+    }
+
+    this._callEvent = function (event) {
+      var callback = this.events[event];
+      if (callback !== null && typeof callback === "function") {
+        this.__log("CALLING EVENT " + event);
+        return callback();
+      }
+    }
+
+    this.init = function () {
+      this._createAppDiv(this.elementId);
+      if (this.customerGroupId !== null && this.saleAmount !== null && this.currencyCode !== null){
+        this._createAppScript(this.backendUrl, "false", this.customerGroupId, this.saleAmount, this.currencyCode, this.tags, this.profile, "ExpressCheckout");
+        this.__log("IS VALID, RENDERING");
+      }else{
+        this.__log("NOT VALID DATA");
+      }
+    }
+    return this;
+  }
   
   backoffice(){
     this.backendUrl = null;
     this.elementId = null;
+    this.tags = null;
+    this.profile = null;
+    this.isExpressCheckout = false;
 
     this.backendUrl = function (url) {
       this.backendUrl = url;
@@ -192,9 +281,22 @@ export default class PWall{
     this.appendTo = function (elementId) {
       this.elementId = elementId;
     }
+    this.setTags = function (tags) {
+      this.tags = tags;
+    }
+    this.setProfile = function (profile) {
+      this.profile = profile;
+    }
+    this.setIsExpressCheckout = function (isExpressCheckout){
+      this.isExpressCheckout = isExpressCheckout;
+    }
     this.init = function () {
       this._createAppDiv(this.elementId);
-      this._createAppScript(this.backendUrl, "true", "0", "0", "");
+      if(this.isExpressCheckout){
+        this._createAppScript(this.backendUrl, "true", "0", "0", "", this.tags, this.profile, "ExpressCheckout");
+      }else{
+        this._createAppScript(this.backendUrl, "true", "0", "0", "", this.tags);
+      }
     }
     return this;
   }
@@ -219,7 +321,7 @@ export default class PWall{
     }
   }
 
-  _createAppScript(backendUrl, isBackoffice, groupId, amount, currency) {
+  _createAppScript(backendUrl, isBackoffice, groupId, amount, currency, tags = null, profile = null, theme = null) {
     var head      = document.getElementsByTagName('head')[0];
     var scriptId  = sipay_constants["elementsIds"]["script"];
     var divId     = sipay_constants["elementsIds"]["div"]; 
@@ -228,18 +330,40 @@ export default class PWall{
     //if exists, update data and re render
     if (document.getElementById(scriptId)) {
       script = document.getElementById(scriptId);
+      if (theme) {
+        script.dataset.theme = theme;
+      } else {
+        script.removeAttribute('data-theme');
+      }
+      if (profile) {
+        script.dataset.profile = profile;
+      } else {
+        script.removeAttribute('data-profile');
+      }
       script.dataset.groupId = groupId;
       script.dataset.amount = amount;
       script.dataset.currency = currency;
+      this._updateValidateFunction();
       window.PaymentWall.start();
+      return;
     }
 
     script.id = scriptId;
     script.type = 'text/javascript';
     script.src = sipay_constants["enviroments"][this.enviroment] + "pwall_app/js/app.js";
+    if(tags){
+      script.dataset.tags = tags;
+    }
+    if(profile){
+      script.dataset.profile = profile;
+    }
+    if(theme){
+      script.dataset.theme = theme;
+    }
     if(isBackoffice === "true"){
       script.dataset.backoffice = isBackoffice;
     }
+    
     script.dataset.placeholder  = "#" + divId;
     script.dataset.groupId      = groupId;
     script.dataset.amount       = amount;
@@ -248,7 +372,6 @@ export default class PWall{
     script.onload = function () { this._setPaymentWallListeners() }.bind(this);
     head.parentNode.appendChild(script);
   }
-
   _setPaymentWallListeners(){
     window.PaymentWall.listenTo(document, 'payment_wall_load', function(){
       var scriptId = sipay_constants["elementsIds"]["div"];
@@ -260,9 +383,10 @@ export default class PWall{
               var request_id = this.parseUrlParams('request_id');
               var method = this.parseUrlParams('method');
               var error = this.parseUrlParams('error');
-              placeholder.dispatchEvent(window.pwall.dispatch('process_redirect', { "error": error, "method": method, "request_id": request_id }));
+              window.pwall.dispatch('process_redirect', { "error": error, "method": method, "request_id": request_id });
               this.processedRedirect = true;
             }
+            window.pwall.dispatch('set_validation_function', { detail: { 'validationFunc': function () { return this._callEvent("validationFunc");}.bind(this) } });
           }.bind(this));
         }
         window.PaymentWall.listenTo(placeholder, "payment_wall_payment_ok", function () {
@@ -271,9 +395,22 @@ export default class PWall{
         window.PaymentWall.listenTo(placeholder, "payment_wall_payment_ko", function () {
           this._callEvent("paymentKo");
         }.bind(this));
+        
       }.bind(this));
     }.bind(this));
     window.PaymentWall.start();
+  }
+
+  _updateValidateFunction(){
+    window.PaymentWall.listenTo(document, 'payment_wall_load', function () {
+      var scriptId = sipay_constants["elementsIds"]["div"];
+      var placeholder = document.getElementById(scriptId);
+      window.PaymentWall.listenTo(placeholder, "payment_wall_loaded", function () {
+          window.PaymentWall.listenTo(placeholder, "payment_wall_drawn", function () {
+            window.pwall.dispatch('set_validation_function', { detail: { 'validationFunc': function () { return this._callEvent("validationFunc"); }.bind(this) } });
+          }.bind(this));
+        }.bind(this));
+      }.bind(this));
   }
 
   parseUrlParams(name) {

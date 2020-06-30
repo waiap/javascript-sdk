@@ -12,7 +12,7 @@ The library should be required, as fas as possible, in the head tag of the page,
 ``` html
 <link rel="stylesheet" href="https://sandbox.sipay.es/pwall_app/css/app.css">
 <script src="https://sandbox.sipay.es/pwall_sdk/pwall_sdk.bundle.js"></script>
-<script src="https://assets-sipay.s3-eu-west-1.amazonaws.com/sdk-js/pwall-app.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/waiap/javascript-sdk/dist/2.0.0/pwall-sdk.min.js"></script>
 ```
 
 It is recommended to download it from the build/ folder and host it on the merchant's server.

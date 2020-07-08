@@ -341,7 +341,7 @@ export default class PWall{
         script.removeAttribute('data-profile');
       }
       script.dataset.groupId = groupId;
-      script.dataset.amount = amount;
+      script.dataset.amount = Math.round(amount);
       script.dataset.currency = currency;
       this._updateValidateFunction();
       window.PaymentWall.start();
@@ -366,7 +366,7 @@ export default class PWall{
     
     script.dataset.placeholder  = "#" + divId;
     script.dataset.groupId      = groupId;
-    script.dataset.amount       = amount;
+    script.dataset.amount       = Math.round(amount);
     script.dataset.currency     = currency;
     script.dataset.endpoint     = backendUrl;
     script.onload = function () { this._setPaymentWallListeners() }.bind(this);

@@ -202,6 +202,7 @@ export default class PWall{
       "paymentKo"         : null,
       "validationFunc"    : function(){return true;}
     }
+    this.logoUrl          = null
 
     this.backendUrl = function (url) {
       this.backendUrl = url;
@@ -233,6 +234,9 @@ export default class PWall{
       this.currencyCode = currencyCode;
       return this;
     }
+    this.setLogoUrl = function (logoUrl) {
+      this.logoUrl = logoUrl;
+    }
 
     //Events 
     this.on = function(event, callback){
@@ -259,7 +263,7 @@ export default class PWall{
     this.init = function () {
       this._createAppDiv(this.elementId);
       if (this.customerGroupId !== null && this.saleAmount !== null && this.currencyCode !== null){
-        this._createAppScript(this.backendUrl, "false", this.customerGroupId, this.saleAmount, this.currencyCode, this.tags, this.profile, "ExpressCheckout");
+        this._createAppScript(this.backendUrl, "false", this.customerGroupId, this.saleAmount, this.currencyCode, this.tags, this.profile, "ExpressCheckout", this.logoUrl);
         this.__log("IS VALID, RENDERING");
       }else{
         this.__log("NOT VALID DATA");
@@ -269,11 +273,11 @@ export default class PWall{
   }
   
   backoffice(){
-    this.backendUrl = null;
-    this.elementId = null;
-    this.tags = null;
-    this.profile = null;
-    this.isExpressCheckout = false;
+    this.backendUrl         = null;
+    this.elementId          = null;
+    this.tags               = null;
+    this.profile            = null;
+    this.isExpressCheckout  = false;
 
     this.backendUrl = function (url) {
       this.backendUrl = url;
@@ -321,7 +325,7 @@ export default class PWall{
     }
   }
 
-  _createAppScript(backendUrl, isBackoffice, groupId, amount, currency, tags = null, profile = null, theme = null) {
+  _createAppScript(backendUrl, isBackoffice, groupId, amount, currency, tags = null, profile = null, theme = null, logoUrl = null) {
     var head      = document.getElementsByTagName('head')[0];
     var scriptId  = sipay_constants["elementsIds"]["script"];
     var divId     = sipay_constants["elementsIds"]["div"]; 
@@ -359,6 +363,9 @@ export default class PWall{
     }
     if(theme){
       script.dataset.theme = theme;
+    }
+    if(logoUrl){
+      script.dataset.logo = logoUrl;
     }
     if(isBackoffice === "true"){
       script.dataset.backoffice = isBackoffice;

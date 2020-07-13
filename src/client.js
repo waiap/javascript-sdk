@@ -339,6 +339,9 @@ export default class PWall{
       } else {
         script.removeAttribute('data-theme');
       }
+      if (tags) {
+        script.dataset.tags = tags;
+      }
       if (profile) {
         script.dataset.profile = profile;
       } else {

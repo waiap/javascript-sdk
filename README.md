@@ -12,7 +12,7 @@ La librería deberá ser requerida, en la medida de lo posible, en la etiqueta h
 ``` html
 <link rel="stylesheet" href="https://sandbox.sipay.es/pwall_app/css/app.css">
 <script src="https://sandbox.sipay.es/pwall_sdk/pwall_sdk.bundle.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/waiap/javascript-sdk/dist/2.0.0/pwall-sdk.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/waiap/javascript-sdk@2.0.1/build/pwall-sdk.min.js"></script>
 ```
 
 Se recomienda descargarla de la carpeta build/ y alojarla en el servidor del comercio.

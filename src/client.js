@@ -9,10 +9,7 @@ export default class PWall{
   }
   //STATIC FUNCTIONS
   static VALIDATE_EMAIL(mail) {
-    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)) {
-      return true;
-    }
-    return false;
+    return /(?:[a-z0-9!#$%&'*+/=?^_{|}~-]+(?:.[a-z0-9!#$%&'*+/=?^_{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(mail);
   }
 
   static VALIDATE_MIN_LENGTH(length) {
@@ -202,6 +199,7 @@ export default class PWall{
       "paymentKo"         : null,
       "validationFunc"    : function(){return true;}
     }
+    this.logoUrl          = null
 
     this.backendUrl = function (url) {
       this.backendUrl = url;
@@ -233,6 +231,9 @@ export default class PWall{
       this.currencyCode = currencyCode;
       return this;
     }
+    this.setLogoUrl = function (logoUrl) {
+      this.logoUrl = logoUrl;
+    }
 
     //Events 
     this.on = function(event, callback){
@@ -259,7 +260,7 @@ export default class PWall{
     this.init = function () {
       this._createAppDiv(this.elementId);
       if (this.customerGroupId !== null && this.saleAmount !== null && this.currencyCode !== null){
-        this._createAppScript(this.backendUrl, "false", this.customerGroupId, this.saleAmount, this.currencyCode, this.tags, this.profile, "ExpressCheckout");
+        this._createAppScript(this.backendUrl, "false", this.customerGroupId, this.saleAmount, this.currencyCode, this.tags, this.profile, "ExpressCheckout", this.logoUrl);
         this.__log("IS VALID, RENDERING");
       }else{
         this.__log("NOT VALID DATA");
@@ -269,11 +270,11 @@ export default class PWall{
   }
   
   backoffice(){
-    this.backendUrl = null;
-    this.elementId = null;
-    this.tags = null;
-    this.profile = null;
-    this.isExpressCheckout = false;
+    this.backendUrl         = null;
+    this.elementId          = null;
+    this.tags               = null;
+    this.profile            = null;
+    this.isExpressCheckout  = false;
 
     this.backendUrl = function (url) {
       this.backendUrl = url;
@@ -321,7 +322,7 @@ export default class PWall{
     }
   }
 
-  _createAppScript(backendUrl, isBackoffice, groupId, amount, currency, tags = null, profile = null, theme = null) {
+  _createAppScript(backendUrl, isBackoffice, groupId, amount, currency, tags = null, profile = null, theme = null, logoUrl = null) {
     var head      = document.getElementsByTagName('head')[0];
     var scriptId  = sipay_constants["elementsIds"]["script"];
     var divId     = sipay_constants["elementsIds"]["div"]; 
@@ -359,6 +360,9 @@ export default class PWall{
     }
     if(theme){
       script.dataset.theme = theme;
+    }
+    if(logoUrl){
+      script.dataset.logo = logoUrl;
     }
     if(isBackoffice === "true"){
       script.dataset.backoffice = isBackoffice;

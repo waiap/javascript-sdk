@@ -1,5 +1,5 @@
 import sipay_constants from './sipay_constants.json';
-import $ from 'zepto';
+import $ from 'webpack-zepto';
 
 export default class PWall{
   constructor(enviroment, debug){

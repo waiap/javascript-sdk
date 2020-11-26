@@ -1,6 +1,6 @@
 {
   "enviroments":{
-    "sandbox": "https://sandbox.sipay.es/",
+    "sandbox": "https://sandbox.waiap.com/",
     "live": "https://live.waiap.com/",
     "develop": "https://develop.sipay.es/"
   },
